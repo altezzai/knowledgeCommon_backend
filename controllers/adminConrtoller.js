@@ -3,6 +3,9 @@ const fs = require("fs");
 const { College } = require("../models");
 const { Department } = require("../models");
 const { University } = require("../models");
+const { CollegeDepartment } = require("../models");
+const { UniversityDepartment } = require("../models");
+// const universityDepartment} = require("../models/universityDepartment");
 
 // router.post("/", upload.single("logo"), async (req, res) => {
 exports.createCollege = async (req, res) => {
@@ -11,13 +14,22 @@ exports.createCollege = async (req, res) => {
       ...req.body,
       logo: req.file ? req.file.filename : null,
     };
-    // try {
-    //   req.fileName = path.basename(req.file.path);
-    //   const collegeData = {
-    //     ...req.body,
-    //     logo: req.fileName || null,
-    //   };
+    const number_of_departments = {
+      ...req.body,
+      number_of_departments: req.number_of_departments,
+    };
+
+    // console.log(collegeData.departmentIds);
     const college = await College.create(collegeData);
+    if (collegeData.departmentIds && collegeData.departmentIds.length > 0) {
+      await CollegeDepartment.bulkCreate(
+        collegeData.departmentIds.map((department_id) => ({
+          collegeId: college.college_id, // assuming 'id' is the primary key field of College
+          departmentId: department_id,
+        }))
+      );
+    }
+
     res.status(201).json(college);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -66,7 +78,17 @@ exports.updateCollegeById = async (req, res) => {
       ...req.body,
       logo: req.file ? req.file.filename : college.logo,
     };
-
+    if (
+      updatedCollegeData.departmentIds &&
+      updatedCollegeData.departmentIds.length > 0
+    ) {
+      await CollegeDepartment.bulkCreate(
+        updatedCollegeData.departmentIds.map((department_id) => ({
+          collegeId: college.college_id, // assuming 'id' is the primary key field of College
+          departmentId: department_id,
+        }))
+      );
+    }
     await college.update(updatedCollegeData);
     res.json(college);
   } catch (error) {
@@ -100,6 +122,12 @@ exports.deleteCollegeById = async (req, res) => {
 exports.createDepartment = async (req, res) => {
   try {
     const department = await Department.create(req.body);
+    const addDepartmentUniversity = {
+      universityId: department.university_id,
+      departmentId: department.department_id,
+    };
+    // console.log(req.body.university_id);
+    await UniversityDepartment.create(addDepartmentUniversity);
     res.status(201).json(department);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -178,6 +206,17 @@ exports.createUniversity = async (req, res) => {
     };
 
     const university = await University.create(universityData);
+    if (
+      universityData.departmentIds &&
+      universityData.departmentIds.length > 0
+    ) {
+      await UniversityDepartment.bulkCreate(
+        universityData.departmentIds.map((department_id) => ({
+          universityId: university.university_id, // assuming 'id' is the primary key field of College
+          departmentId: department_id,
+        }))
+      );
+    }
     res.status(201).json(university);
   } catch (error) {
     res.status(400).json({ error: "create error" });
@@ -225,6 +264,17 @@ exports.updateUniversityById = async (req, res) => {
       logo: req.file ? req.file.filename : university.logo,
       updated_at: new Date(),
     };
+    if (
+      updatedUniversityData.departmentIds &&
+      updatedUniversityData.departmentIds.length > 0
+    ) {
+      await UniversityDepartment.bulkCreate(
+        updatedUniversityData.departmentIds.map((department_id) => ({
+          universityId: university.university_id, // assuming 'id' is the primary key field of College
+          departmentId: department_id,
+        }))
+      );
+    }
 
     await university.update(updatedUniversityData);
     res.json(university);

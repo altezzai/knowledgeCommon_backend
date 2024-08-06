@@ -106,5 +106,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
+  College.associate = (models) => {
+    College.belongsToMany(models.Department, {
+      through: "CollegeDepartment",
+      foreignKey: "collegeId",
+      otherKey: "departmentId",
+    });
+  };
   return College;
 };

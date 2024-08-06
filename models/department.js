@@ -38,6 +38,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false, // If your table has timestamps columns, set this to true and remove last_updated from the model
     }
   );
-
+  Department.associate = (models) => {
+    Department.belongsToMany(models.College, {
+      through: "CollegeDepartment",
+      foreignKey: "departmentId",
+      otherKey: "collegeId",
+    });
+  };
   return Department;
 };
