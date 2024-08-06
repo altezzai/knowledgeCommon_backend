@@ -38,7 +38,16 @@ exports.createCollege = async (req, res) => {
 
 exports.getColleges = async (req, res) => {
   try {
-    const colleges = await College.findAll();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const colleges = await College.findAll({
+      offset,
+      limit,
+      order: [["created_at", "DESC"]],
+      // include: User,
+    });
     res.json(colleges);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -137,7 +146,16 @@ exports.createDepartment = async (req, res) => {
 // Get all departments
 exports.getDepartments = async (req, res) => {
   try {
-    const departments = await Department.findAll();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const departments = await Department.findAll({
+      offset,
+      limit,
+      order: [["created_at", "DESC"]],
+      // include: User,
+    });
     res.status(200).json(departments);
   } catch (error) {
     res.status(500).json({ error: error.message });

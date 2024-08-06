@@ -22,7 +22,16 @@ exports.createSubmission = async (req, res) => {
 
 exports.getSubmissions = async (req, res) => {
   try {
-    const submissions = await Submission.findAll();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const submissions = await Submission.findAll({
+      offset,
+      limit,
+      order: [["created_at", "DESC"]],
+      // include: User,
+    });
     res.status(200).json(submissions);
   } catch (error) {
     res.status(500).json({ error: error.message });
