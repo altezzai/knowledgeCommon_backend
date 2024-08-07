@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
-const adminController = require("../controllers/adminConrtoller");
+const adminController = require("../controllers/adminController");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -32,23 +32,16 @@ router.put("/:id", upload.single("logo"), adminController.updateCollegeById);
 router.delete("/:id", adminController.deleteCollegeById);
 
 //Department
-router.post(
-  "/createDepartment/",
-  upload.single("logo"),
-  adminController.createDepartment
-);
+router.post("/createDepartment/", adminController.createDepartment);
 router.get("/getAll/Departments/", adminController.getDepartments);
 router.get("/getDepartmentId/:id", adminController.getDepartmentId);
-router.put(
-  "/updateDepartmentById/:id",
-  upload.single("logo"),
-  adminController.updateDepartmentById
-);
+router.put("/updateDepartmentById/:id", adminController.updateDepartmentById);
 router.delete(
   "/deleteDepartmentById/:id",
   adminController.deleteDepartmentById
 );
-
+//search
+// router.post("/search/", adminController.search);
 //university
 router.post(
   "/createUniversity/",

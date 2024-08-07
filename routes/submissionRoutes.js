@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const submissionController = require("../controllers/submissionController");
+const adminController = require("../controllers/adminController");
 
 // Define storage for file uploads
 const fileStorage = multer.diskStorage({
@@ -36,9 +37,12 @@ const upload = multer({
 
 // Routes
 router.post("/", upload, submissionController.createSubmission);
-router.get("/", submissionController.getSubmissions);
+router.get("/", submissionController.searchSubmissions);
 router.get("/:id", submissionController.getSubmissionById);
 router.put("/:id", upload, submissionController.updateSubmissionById);
 router.delete("/:id", submissionController.deleteSubmissionById);
+
+router.get("/get/searchResult/", submissionController.searchSubmissions);
+router.post("/search/", submissionController.search);
 
 module.exports = router;

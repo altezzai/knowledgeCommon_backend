@@ -1,7 +1,54 @@
 const path = require("path");
 const fs = require("fs");
 const { Submission } = require("../models");
+const { Op } = require("sequelize");
 
+exports.search = async (req, res) => {
+  try {
+    const reqest = { ...req.body };
+    console.log(reqest.title);
+    const searchQuery = reqest.title;
+    console.log(searchQuery);
+    if (!searchQuery) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const submissions = await Submission.findAll({
+      where: {
+        [Op.or]: [
+          {
+            title: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            keywords: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            submission_type: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            authors: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            abstract: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+        ],
+      },
+    });
+    res.status(201).json(submissions);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 exports.createSubmission = async (req, res) => {
   try {
     const submissionData = {
@@ -79,6 +126,28 @@ exports.updateSubmissionById = async (req, res) => {
     res.status(200).json(submission);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+exports.searchSubmissions = async (req, res) => {
+  try {
+    const searchQuery = req.body.q;
+    console.log(searchQuery);
+    if (!searchQuery) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const submissions = await Submission.findAll({
+      where: {
+        title: {
+          [Op.like]: `%${searchQuery}%`,
+        },
+      },
+    });
+
+    res.status(200).json(submissions);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 

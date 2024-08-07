@@ -3,33 +3,19 @@ const fs = require("fs");
 const { College } = require("../models");
 const { Department } = require("../models");
 const { University } = require("../models");
-const { CollegeDepartment } = require("../models");
-const { UniversityDepartment } = require("../models");
-// const universityDepartment} = require("../models/universityDepartment");
+const { Submission } = require("../models");
+const { Op } = require("sequelize");
 
 // router.post("/", upload.single("logo"), async (req, res) => {
+
 exports.createCollege = async (req, res) => {
   try {
     const collegeData = {
       ...req.body,
       logo: req.file ? req.file.filename : null,
     };
-    const number_of_departments = {
-      ...req.body,
-      number_of_departments: req.number_of_departments,
-    };
 
-    // console.log(collegeData.departmentIds);
     const college = await College.create(collegeData);
-    if (collegeData.departmentIds && collegeData.departmentIds.length > 0) {
-      await CollegeDepartment.bulkCreate(
-        collegeData.departmentIds.map((department_id) => ({
-          collegeId: college.college_id, // assuming 'id' is the primary key field of College
-          departmentId: department_id,
-        }))
-      );
-    }
-
     res.status(201).json(college);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -38,16 +24,7 @@ exports.createCollege = async (req, res) => {
 
 exports.getColleges = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
-
-    const colleges = await College.findAll({
-      offset,
-      limit,
-      order: [["created_at", "DESC"]],
-      // include: User,
-    });
+    const colleges = await College.findAll();
     res.json(colleges);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -87,17 +64,7 @@ exports.updateCollegeById = async (req, res) => {
       ...req.body,
       logo: req.file ? req.file.filename : college.logo,
     };
-    if (
-      updatedCollegeData.departmentIds &&
-      updatedCollegeData.departmentIds.length > 0
-    ) {
-      await CollegeDepartment.bulkCreate(
-        updatedCollegeData.departmentIds.map((department_id) => ({
-          collegeId: college.college_id, // assuming 'id' is the primary key field of College
-          departmentId: department_id,
-        }))
-      );
-    }
+
     await college.update(updatedCollegeData);
     res.json(college);
   } catch (error) {
@@ -131,12 +98,6 @@ exports.deleteCollegeById = async (req, res) => {
 exports.createDepartment = async (req, res) => {
   try {
     const department = await Department.create(req.body);
-    const addDepartmentUniversity = {
-      universityId: department.university_id,
-      departmentId: department.department_id,
-    };
-    // console.log(req.body.university_id);
-    await UniversityDepartment.create(addDepartmentUniversity);
     res.status(201).json(department);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -146,16 +107,7 @@ exports.createDepartment = async (req, res) => {
 // Get all departments
 exports.getDepartments = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const offset = (page - 1) * limit;
-
-    const departments = await Department.findAll({
-      offset,
-      limit,
-      order: [["created_at", "DESC"]],
-      // include: User,
-    });
+    const departments = await Department.findAll();
     res.status(200).json(departments);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -194,6 +146,29 @@ exports.updateDepartmentById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+////search submission name
+// exports.search = async (req, res) => {
+//   try {
+//     const reqest = { ...req.body };
+//     console.log(reqest.title);
+//     const searchQuery = reqest.title;
+//     console.log(searchQuery);
+//     if (!searchQuery) {
+//       return res.status(400).json({ error: "Search query is required" });
+//     }
+
+//     const submissions = await Submission.findAll({
+//       where: {
+//         title: {
+//           [Op.like]: `%${searchQuery}%`,
+//         },
+//       },
+//     });
+//     res.status(201).json(submissions);
+//   } catch (error) {
+//     res.status(400).json({ error: error.message });
+//   }
+// };
 
 // Delete a department by ID
 // router.delete("/:id", async (req, res) => {
@@ -224,17 +199,6 @@ exports.createUniversity = async (req, res) => {
     };
 
     const university = await University.create(universityData);
-    if (
-      universityData.departmentIds &&
-      universityData.departmentIds.length > 0
-    ) {
-      await UniversityDepartment.bulkCreate(
-        universityData.departmentIds.map((department_id) => ({
-          universityId: university.university_id, // assuming 'id' is the primary key field of College
-          departmentId: department_id,
-        }))
-      );
-    }
     res.status(201).json(university);
   } catch (error) {
     res.status(400).json({ error: "create error" });
@@ -282,17 +246,6 @@ exports.updateUniversityById = async (req, res) => {
       logo: req.file ? req.file.filename : university.logo,
       updated_at: new Date(),
     };
-    if (
-      updatedUniversityData.departmentIds &&
-      updatedUniversityData.departmentIds.length > 0
-    ) {
-      await UniversityDepartment.bulkCreate(
-        updatedUniversityData.departmentIds.map((department_id) => ({
-          universityId: university.university_id, // assuming 'id' is the primary key field of College
-          departmentId: department_id,
-        }))
-      );
-    }
 
     await university.update(updatedUniversityData);
     res.json(university);
