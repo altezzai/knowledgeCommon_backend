@@ -136,6 +136,15 @@ module.exports = {
       notes: {
         type: Sequelize.TEXT,
       },
+      status: {
+        type: Sequelize.STRING,
+      },
+      views: {
+        type: Sequelize.INTEGER,
+      },
+      downloads: {
+        type: Sequelize.INTEGER,
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,

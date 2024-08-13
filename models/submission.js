@@ -137,6 +137,15 @@ module.exports = (sequelize, DataTypes) => {
       notes: {
         type: DataTypes.TEXT,
       },
+      status: {
+        type: DataTypes.STRING,
+      },
+      views: {
+        type: DataTypes.INTEGER,
+      },
+      downloads: {
+        type: DataTypes.INTEGER,
+      },
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,
