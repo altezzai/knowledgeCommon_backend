@@ -97,6 +97,13 @@ exports.deleteCollegeById = async (req, res) => {
 // router.post("/", async (req, res) => {
 exports.createDepartment = async (req, res) => {
   try {
+    const { department_name } = req.body;
+    const existingDepartment = await Department.findOne({
+      where: { department_name },
+    });
+    if (existingDepartment) {
+      return res.status(400).json({ error: "Department name already exists" });
+    }
     const departmentdata = {
       ...req.body,
       icon: req.file ? req.file.filename : null,
@@ -137,6 +144,14 @@ exports.getDepartmentId = async (req, res) => {
 // router.put("/:id", async (req, res) => {
 exports.updateDepartmentById = async (req, res) => {
   try {
+    const { department_name } = req.body;
+    const existingDepartment = await Department.findOne({
+      where: { department_name },
+    });
+    if (existingDepartment) {
+      return res.status(400).json({ error: "Department name already exists" });
+    }
+
     const department = await Department.findByPk(req.params.id);
     if (req.file && department.icon) {
       fs.unlinkSync(path.join("uploads/department_icons/", department.icon));
