@@ -9,8 +9,8 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      university_id: {
-        type: Sequelize.INTEGER,
+      icon: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       department_name: {

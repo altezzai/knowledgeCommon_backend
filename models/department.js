@@ -10,13 +10,13 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         allowNull: false,
       },
-      university_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
       department_name: {
         type: DataTypes.STRING(255),
         allowNull: false,
+      },
+      icon: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       description: {
         type: DataTypes.TEXT,

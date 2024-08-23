@@ -12,8 +12,18 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + "-" + file.originalname);
   },
 });
-
 const upload = multer({ storage: storage });
+
+const depstorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/department_icons/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const depUpload = multer({ storage: depstorage });
 
 const unistorage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -25,21 +35,34 @@ const unistorage = multer.diskStorage({
 });
 const uniupload = multer({ storage: unistorage });
 
-router.post("/", upload.single("logo"), adminController.createCollege);
-router.get("/", adminController.getColleges);
-router.get("/:id", adminController.getCollegeId);
-router.put("/:id", upload.single("logo"), adminController.updateCollegeById);
-router.delete("/:id", adminController.deleteCollegeById);
+router.post(
+  "/createCollege/",
+  upload.single("logo"),
+  adminController.createCollege
+);
+router.get("/getColleges/", adminController.getColleges);
+router.get("/getCollege/:id", adminController.getCollegeId);
+router.put(
+  "/updateCollege/:id",
+  upload.single("logo"),
+  adminController.updateCollegeById
+);
+router.delete("/deleteCollege/:id", adminController.deleteCollegeById);
 
 //Department
-router.post("/createDepartment/", adminController.createDepartment);
-router.get("/getAll/Departments/", adminController.getDepartments);
-router.get("/getDepartmentId/:id", adminController.getDepartmentId);
-router.put("/updateDepartmentById/:id", adminController.updateDepartmentById);
-router.delete(
-  "/deleteDepartmentById/:id",
-  adminController.deleteDepartmentById
+router.post(
+  "/createDepartment/",
+  depUpload.single("icon"),
+  adminController.createDepartment
 );
+router.get("/getDepartments/", adminController.getDepartments);
+router.get("/getDepartment/:id", adminController.getDepartmentId);
+router.put(
+  "/updateDepartment/:id",
+  depUpload.single("icon"),
+  adminController.updateDepartmentById
+);
+router.delete("/deleteDepartment/:id", adminController.deleteDepartmentById);
 //search
 // router.post("/search/", adminController.search);
 //university
@@ -48,16 +71,13 @@ router.post(
   uniupload.single("logo"),
   adminController.createUniversity
 );
-router.get("/getAll/Universitys/", adminController.getUniversitys);
-router.get("/getUniversityId/:id", adminController.getUniversityId);
+router.get("/getUniversitys/", adminController.getUniversitys);
+router.get("/getUniversity/:id", adminController.getUniversityId);
 router.put(
-  "/updateUniversityById/:id",
+  "/updateUniversity/:id",
   uniupload.single("logo"),
   adminController.updateUniversityById
 );
-router.delete(
-  "/deleteUniversityById/:id",
-  adminController.deleteUniversityById
-);
+router.delete("/deleteUniversity/:id", adminController.deleteUniversityById);
 
 module.exports = router;

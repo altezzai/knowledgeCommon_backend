@@ -97,7 +97,11 @@ exports.deleteCollegeById = async (req, res) => {
 // router.post("/", async (req, res) => {
 exports.createDepartment = async (req, res) => {
   try {
-    const department = await Department.create(req.body);
+    const departmentdata = {
+      ...req.body,
+      icon: req.file ? req.file.filename : null,
+    };
+    const department = await Department.create(departmentdata);
     res.status(201).json(department);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -133,15 +137,17 @@ exports.getDepartmentId = async (req, res) => {
 // router.put("/:id", async (req, res) => {
 exports.updateDepartmentById = async (req, res) => {
   try {
-    const [updated] = await Department.update(req.body, {
-      where: { department_id: req.params.id },
-    });
-    if (updated) {
-      const updatedDepartment = await Department.findByPk(req.params.id);
-      res.status(200).json(updatedDepartment);
-    } else {
-      res.status(404).json({ error: "Department not found" });
+    const department = await Department.findByPk(req.params.id);
+    if (req.file && department.icon) {
+      fs.unlinkSync(path.join("uploads/department_icons/", department.icon));
     }
+    const updatedDepartmentData = {
+      ...req.body,
+      icon: req.file ? req.file.filename : department.icon,
+    };
+
+    await department.update(updatedDepartmentData);
+    res.json(department);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
