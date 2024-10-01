@@ -226,7 +226,7 @@ exports.createUniversity = async (req, res) => {
   }
 };
 // Get all universities
-exports.getUniversitys = async (req, res) => {
+exports.getUniversities = async (req, res) => {
   try {
     const universities = await University.findAll();
     res.json(universities);

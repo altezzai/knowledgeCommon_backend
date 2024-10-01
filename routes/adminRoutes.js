@@ -71,7 +71,7 @@ router.post(
   uniupload.single("logo"),
   adminController.createUniversity
 );
-router.get("/getUniversitys/", adminController.getUniversitys);
+router.get("/getUniversities/", adminController.getUniversities);
 router.get("/getUniversity/:id", adminController.getUniversityId);
 router.put(
   "/updateUniversity/:id",
