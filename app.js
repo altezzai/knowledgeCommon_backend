@@ -11,11 +11,11 @@ const { sequelize } = require("./models");
 
 const app = express();
 
-app.use(helmet());
-app.use(cors());
+// app.use(helmet());
+// app.use(cors());
 app.use(morgan("dev"));
-app.use("/uploads", express.static("uploads"));
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api/v1/submissions", submissionRoutes);
 app.use("/api/v1/admin", adminRoutes);

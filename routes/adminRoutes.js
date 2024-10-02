@@ -35,6 +35,16 @@ const unistorage = multer.diskStorage({
 });
 const uniupload = multer({ storage: unistorage });
 
+const stfstorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/staff_photo/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+const stfupload = multer({ storage: stfstorage });
+
 router.post(
   "/createCollege/",
   upload.single("logo"),
@@ -79,5 +89,19 @@ router.put(
   adminController.updateUniversityById
 );
 router.delete("/deleteUniversity/:id", adminController.deleteUniversityById);
+router.post(
+  "/createStaff/",
+  stfupload.single("profile_picture"),
+  adminController.createStaff
+);
+
+router.get("/getStaffs/", adminController.getStaffs);
+router.get("/getStaffId/:id", adminController.getStaffId);
+router.put(
+  "/updateStaff/:id",
+  stfupload.single("profile_picture"),
+  adminController.updateStaff
+);
+router.delete("/deleteStaff/:id", adminController.deleteStaff);
 
 module.exports = router;

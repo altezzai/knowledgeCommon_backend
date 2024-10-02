@@ -4,6 +4,8 @@ const { College } = require("../models");
 const { Department } = require("../models");
 const { University } = require("../models");
 const { Submission } = require("../models");
+const { Staff } = require("../models");
+
 const { Op } = require("sequelize");
 
 // router.post("/", upload.single("logo"), async (req, res) => {
@@ -167,29 +169,6 @@ exports.updateDepartmentById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-////search submission name
-// exports.search = async (req, res) => {
-//   try {
-//     const reqest = { ...req.body };
-//     console.log(reqest.title);
-//     const searchQuery = reqest.title;
-//     console.log(searchQuery);
-//     if (!searchQuery) {
-//       return res.status(400).json({ error: "Search query is required" });
-//     }
-
-//     const submissions = await Submission.findAll({
-//       where: {
-//         title: {
-//           [Op.like]: `%${searchQuery}%`,
-//         },
-//       },
-//     });
-//     res.status(201).json(submissions);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
 
 // Delete a department by ID
 // router.delete("/:id", async (req, res) => {
@@ -283,11 +262,105 @@ exports.deleteUniversityById = async (req, res) => {
     if (!university) {
       return res.status(404).json({ error: "University not found" });
     }
-    if (req.file && university.logo) {
+    if (university.logo) {
       fs.unlinkSync(path.join("uploads/university_logos/", university.logo));
     }
     await university.destroy();
     res.json({ message: "University deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+// Create a new staff member
+exports.createStaff = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const existingemail = await Staff.findOne({
+      where: { email },
+    });
+    if (existingemail) {
+      return res.status(400).json({ error: "Email name already exists" });
+    }
+    const data = {
+      ...req.body,
+      profile_picture: req.file ? req.file.filename : null,
+    };
+    const staff = await Staff.create(data);
+    res.status(201).json(staff);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get all staff members
+exports.getStaffs = async (req, res) => {
+  try {
+    const staff = await Staff.findAll();
+    res.json(staff);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get a single staff member by ID
+exports.getStaffId = async (req, res) => {
+  try {
+    const staff = await Staff.findByPk(req.params.id);
+    if (staff) {
+      res.json(staff);
+    } else {
+      res.status(404).json({ error: "Staff member not found" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Update a staff member
+exports.updateStaff = async (req, res) => {
+  try {
+    const staff = await Staff.findByPk(req.params.id);
+    if (!staff) {
+      return res.status(404).json({ error: "Staff member not found" });
+    }
+    // Check if email is being updated and is unique
+    if (req.body.email && req.body.email !== staff.email) {
+      const emailExists = await Staff.findOne({
+        where: { email: req.body.email },
+      });
+      if (emailExists) {
+        return res.status(400).json({ error: "Email is already in use" });
+      }
+    }
+    // Delete the old profile picture if a new one is uploaded
+    if (req.file && staff.profile_picture) {
+      fs.unlinkSync(path.join("uploads/staff_photo/", staff.profile_picture));
+    }
+    const updatedData = {
+      ...req.body,
+      profile_picture: req.file ? req.file.filename : staff.profile_picture,
+    };
+    await staff.update(updatedData);
+    res.json(staff);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Delete a staff member
+exports.deleteStaff = async (req, res) => {
+  try {
+    const staff = await Staff.findByPk(req.params.id);
+    if (!staff) {
+      return res.status(404).json({ error: "Staff member not found" });
+    }
+
+    // Delete the old profile picture
+    if (staff.profile_picture) {
+      fs.unlinkSync(path.join("uploads/staff_photo/", staff.profile_picture));
+    }
+    await staff.destroy();
+    res.json({ message: "Staff member deleted successfully" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

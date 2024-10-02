@@ -1,6 +1,6 @@
 {
   "development": {
-    "username": "skrolls",
+    "username": "root",
     "password": null,
     "database": "knowledge",
     "host": "127.0.0.1",
