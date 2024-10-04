@@ -7,6 +7,8 @@ const { Submission } = require("../models");
 const { Staff } = require("../models");
 const { EditorPostfeed } = require("../models");
 const { Feedback } = require("../models");
+const { CollegeDepartment } = require("../models");
+const { UniversityDepartment } = require("../models");
 
 const { Op } = require("sequelize");
 // const feedback = require("../models/feedback");
@@ -21,6 +23,14 @@ exports.createCollege = async (req, res) => {
     };
 
     const college = await College.create(collegeData);
+    if (collegeData.departmentIds && collegeData.departmentIds.length > 0) {
+      await CollegeDepartment.bulkCreate(
+        JSON.parse(collegeData.departmentIds).map((department_id) => ({
+          collegeId: college.college_id, // assuming 'id' is the primary key field of College
+          departmentId: department_id,
+        }))
+      );
+    }
     res.status(201).json(college);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -71,6 +81,33 @@ exports.updateCollegeById = async (req, res) => {
     };
 
     await college.update(updatedCollegeData);
+
+    // remove dublicates
+    const existingDepartments = await CollegeDepartment.findAll({
+      where: {
+        collegeId: college.college_id,
+      },
+      attributes: ["departmentId"], // Only get departmentId for comparison
+    });
+    const existingDepartmentIds = existingDepartments.map(
+      (dept) => dept.departmentId
+    );
+
+    let result = JSON.parse(updatedCollegeData.departmentIds).filter(
+      (item) => !existingDepartmentIds.includes(item)
+    );
+
+    if (
+      updatedCollegeData.departmentIds &&
+      updatedCollegeData.departmentIds.length >= 0
+    ) {
+      await CollegeDepartment.bulkCreate(
+        result.map((department_id) => ({
+          collegeId: college.college_id, // assuming 'id' is the primary key field of College
+          departmentId: department_id,
+        }))
+      );
+    }
     res.json(college);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -202,6 +239,17 @@ exports.createUniversity = async (req, res) => {
     };
 
     const university = await University.create(universityData);
+    if (
+      universityData.departmentIds &&
+      universityData.departmentIds.length > 0
+    ) {
+      await UniversityDepartment.bulkCreate(
+        JSON.parse(universityData.departmentIds).map((department_id) => ({
+          universityId: university.university_id, // assuming 'id' is the primary key field of College
+          departmentId: department_id,
+        }))
+      );
+    }
     res.status(201).json(university);
   } catch (error) {
     res.status(400).json({ error: "create error" });
@@ -251,6 +299,32 @@ exports.updateUniversityById = async (req, res) => {
     };
 
     await university.update(updatedUniversityData);
+
+    const existingDepartments = await UniversityDepartment.findAll({
+      where: {
+        universityId: university.university_id,
+      },
+      attributes: ["departmentId"], // Only get departmentId for comparison
+    });
+    const existingDepartmentIds = existingDepartments.map(
+      (dept) => dept.departmentId
+    );
+
+    let result = JSON.parse(updatedUniversityData.departmentIds).filter(
+      (item) => !existingDepartmentIds.includes(item)
+    );
+
+    if (
+      updatedUniversityData.departmentIds &&
+      updatedUniversityData.departmentIds.length > 0
+    ) {
+      await UniversityDepartment.bulkCreate(
+        result.map((department_id) => ({
+          universityId: university.university_id, // assuming 'id' is the primary key field of university
+          departmentId: department_id,
+        }))
+      );
+    }
     res.json(university);
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -36,9 +36,19 @@ module.exports = {
         allowNull: false,
       },
     });
+
+    await queryInterface.addConstraint("collegeDepartments", {
+      fields: ["collegeId", "departmentId"],
+      name: "unique_collegeDepartments",
+      type: "unique",
+    });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("universityDepartments");
+    await queryInterface.removeConstraint(
+      "collegeDepartments",
+      "unique_collegeDepartments"
+    );
+    await queryInterface.dropTable("collegeDepartments");
   },
 };
