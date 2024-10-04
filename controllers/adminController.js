@@ -5,8 +5,11 @@ const { Department } = require("../models");
 const { University } = require("../models");
 const { Submission } = require("../models");
 const { Staff } = require("../models");
+const { EditorPostfeed } = require("../models");
+const { Feedback } = require("../models");
 
 const { Op } = require("sequelize");
+// const feedback = require("../models/feedback");
 
 // router.post("/", upload.single("logo"), async (req, res) => {
 
@@ -361,6 +364,156 @@ exports.deleteStaff = async (req, res) => {
     }
     await staff.destroy();
     res.json({ message: "Staff member deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+// Create a new post in editorPostfeed
+exports.createEfeed = async (req, res) => {
+  try {
+    const { submission_id } = req.body;
+    const existingsubmission_id = await EditorPostfeed.findOne({
+      where: { submission_id },
+    });
+    if (existingsubmission_id) {
+      return res.status(400).json({ error: "submission id already exists" });
+    }
+    const data = { ...req.body, file: req.file ? req.file.filename : null };
+    const post = await EditorPostfeed.create(data);
+    res.status(201).json(post);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get all posts
+exports.getEfeed = async (req, res) => {
+  try {
+    const posts = await EditorPostfeed.findAll();
+    res.json(posts);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get a single post by ID
+exports.getEfeedbyid = async (req, res) => {
+  try {
+    const post = await EditorPostfeed.findByPk(req.params.id);
+    if (post) {
+      res.json(post);
+    } else {
+      res.status(404).json({ error: "Post not found" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Update a post
+exports.updateEfeed = async (req, res) => {
+  try {
+    const post = await EditorPostfeed.findByPk(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Delete the old file if a new one is uploaded
+    if (req.file && post.file) {
+      fs.unlinkSync(path.join("uploads/feed_file/", post.file));
+    }
+
+    const updatedData = {
+      ...req.body,
+      file: req.file ? req.file.filename : post.file,
+    };
+    await post.update(updatedData);
+    res.json(post);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Delete a post
+exports.deleteEfeed = async (req, res) => {
+  try {
+    const post = await EditorPostfeed.findByPk(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Delete the file if it exists
+    if (post.file) {
+      fs.unlinkSync(path.join("uploads/feed_file/", post.file));
+    }
+
+    await post.destroy();
+    res.json({ message: "Post deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+// Create a new feedback entry
+exports.createfeedback = async (req, res) => {
+  console.log(req.body);
+  try {
+    const feedback = await Feedback.create(req.body);
+    res.status(201).json(feedback);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get all feedback entries
+exports.getfeedbacks = async (req, res) => {
+  try {
+    const feedbacks = await Feedback.findAll();
+    res.json(feedbacks);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Get a single feedback entry by ID
+exports.getfeedbackid = async (req, res) => {
+  try {
+    const feedback = await Feedback.findByPk(req.params.id);
+    if (feedback) {
+      res.json(feedback);
+    } else {
+      res.status(404).json({ error: "Feedback not found" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Update a feedback entry
+exports.updatefeedback = async (req, res) => {
+  try {
+    const feedback = await Feedback.findByPk(req.params.id);
+    if (!feedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    await feedback.update(req.body);
+    res.json(feedback);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Delete a feedback entry (soft delete)
+exports.deletefeedback = async (req, res) => {
+  try {
+    const feedback = await Feedback.findByPk(req.params.id);
+    if (!feedback) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    feedback.trash = true; // Soft delete
+    await feedback.save();
+    res.json({ message: "Feedback marked as trashed" });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

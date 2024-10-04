@@ -146,6 +146,20 @@ module.exports = (sequelize, DataTypes) => {
       downloads: {
         type: DataTypes.INTEGER,
       },
+
+      user_id: {
+        type: DataTypes.INTEGER,
+      },
+      url: {
+        type: DataTypes.STRING,
+      },
+      reviewer_name: {
+        type: DataTypes.STRING,
+      },
+      trash: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,
@@ -155,15 +169,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-      },
-      user_id: {
-        type: DataTypes.INTEGER,
-      },
-      url: {
-        type: DataTypes.STRING,
-      },
-      reviewer_name: {
-        type: DataTypes.STRING,
       },
     },
     {

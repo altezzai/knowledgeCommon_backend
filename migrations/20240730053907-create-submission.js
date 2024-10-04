@@ -145,6 +145,20 @@ module.exports = {
       downloads: {
         type: Sequelize.INTEGER,
       },
+
+      user_id: {
+        type: Sequelize.INTEGER,
+      },
+      url: {
+        type: Sequelize.STRING,
+      },
+      reviewer_name: {
+        type: Sequelize.STRING,
+      },
+      trash: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -154,15 +168,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
-      },
-      user_id: {
-        type: Sequelize.INTEGER,
-      },
-      url: {
-        type: Sequelize.STRING,
-      },
-      reviewer_name: {
-        type: Sequelize.STRING,
       },
     });
   },

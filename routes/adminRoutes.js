@@ -45,6 +45,16 @@ const stfstorage = multer.diskStorage({
 });
 const stfupload = multer({ storage: stfstorage });
 
+const efstorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/feed_file/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+const efupload = multer({ storage: efstorage });
+//Manage college
 router.post(
   "/createCollege/",
   upload.single("logo"),
@@ -59,7 +69,7 @@ router.put(
 );
 router.delete("/deleteCollege/:id", adminController.deleteCollegeById);
 
-//Department
+// Manage Department
 router.post(
   "/createDepartment/",
   depUpload.single("icon"),
@@ -75,7 +85,8 @@ router.put(
 router.delete("/deleteDepartment/:id", adminController.deleteDepartmentById);
 //search
 // router.post("/search/", adminController.search);
-//university
+
+//Manage university
 router.post(
   "/createUniversity/",
   uniupload.single("logo"),
@@ -89,6 +100,8 @@ router.put(
   adminController.updateUniversityById
 );
 router.delete("/deleteUniversity/:id", adminController.deleteUniversityById);
+
+//manage Staff
 router.post(
   "/createStaff/",
   stfupload.single("profile_picture"),
@@ -103,5 +116,32 @@ router.put(
   adminController.updateStaff
 );
 router.delete("/deleteStaff/:id", adminController.deleteStaff);
+
+//manage EditorPostFeed
+router.post(
+  "/editorPostfeed/",
+  efupload.single("file"),
+  adminController.createEfeed
+);
+
+router.get("/editorPostfeed/", adminController.getEfeed);
+router.get("/editorPostfeed/:id", adminController.getEfeedbyid);
+router.put(
+  "/editorPostfeed/:id",
+  efupload.single("file"),
+  adminController.updateEfeed
+);
+router.delete("/editorPostfeed/:id", adminController.deleteEfeed);
+
+//manage Feedback from Editorial bord
+router.post("/feedback/", adminController.createfeedback);
+// // Get all feedback
+router.get("/feedback/", adminController.getfeedbacks);
+// Get feedback by ID
+router.get("/feedback/:id", adminController.getfeedbackid);
+// Update feedback
+router.put("/feedback/:id", adminController.updatefeedback);
+// Delete feedback
+router.delete("/feedback/:id", adminController.deletefeedback);
 
 module.exports = router;

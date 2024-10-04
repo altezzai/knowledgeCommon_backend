@@ -157,8 +157,9 @@ exports.deleteSubmissionById = async (req, res) => {
     if (!submission) {
       return res.status(404).json({ error: "Submission not found" });
     }
-    await submission.destroy();
-    res.status(200).send("Successfully Deleted");
+    submission.trash = true; // Soft delete
+    await submission.save();
+    res.status(200).send("Successfully trash");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
