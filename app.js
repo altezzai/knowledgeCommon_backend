@@ -7,6 +7,7 @@ dotenv.config();
 
 const submissionRoutes = require("./routes/submissionRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const publicRoutes = require("./routes/publicRoutes");
 const { sequelize } = require("./models");
 
 const app = express();
@@ -19,6 +20,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.use("/api/v1/submissions", submissionRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/public", publicRoutes);
 
 const PORT = process.env.PORT || 3000;
 const startServer = async () => {
