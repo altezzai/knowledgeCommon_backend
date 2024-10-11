@@ -4,8 +4,21 @@ const publicController = require("../controllers/publicController"); // Adjust t
 
 // Route to get departments by college ID
 router.get(
-  "/college/:collegeId/departments/",
+  "/searchcollege/:collegeId/departments/",
   publicController.getDepartmentsByCollegeId
+);
+router.get(
+  "/college/:collegeId/searchDepartments/",
+  publicController.searchDepartmentsByCollegeId
+);
+router.get(
+  "/university/:univId/departments/",
+  publicController.getDepartmentsByUniversityId
+);
+router.get("/searchDepartments/", publicController.searchDepartment);
+router.get(
+  "/university/:univId/searchDepartments/",
+  publicController.searchDepartmentsByUniversityId
 );
 
 module.exports = router;

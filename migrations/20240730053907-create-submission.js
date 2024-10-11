@@ -138,6 +138,7 @@ module.exports = {
       },
       status: {
         type: Sequelize.STRING,
+        defaultValue: "pending",
       },
       views: {
         type: Sequelize.INTEGER,
