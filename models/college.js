@@ -95,8 +95,8 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: DataTypes.NOW,
       },
       trash: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     {

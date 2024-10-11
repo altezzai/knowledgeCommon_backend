@@ -76,6 +76,9 @@ module.exports = {
       department: {
         type: Sequelize.STRING,
       },
+      university: {
+        type: Sequelize.INTEGER,
+      },
       institution: {
         type: Sequelize.STRING,
       },

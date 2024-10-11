@@ -93,8 +93,8 @@ module.exports = {
         type: Sequelize.DATE,
       },
       trash: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
     });
   },

@@ -5,7 +5,116 @@ const { Op } = require("sequelize");
 const { Department } = require("../models");
 const { CollegeDepartment } = require("../models");
 const { UniversityDepartment } = require("../models");
+const { Submission } = require("../models");
+const { College } = require("../models");
 
+exports.contentsearch = async (req, res) => {
+  try {
+    const searchQuery = req.body.title;
+    console.log(searchQuery);
+    if (!searchQuery) {
+      return res.status(400).json({ error: "Search query is required" });
+    }
+
+    const submissions = await Submission.findAll({
+      where: {
+        status: "approved",
+        [Op.or]: [
+          {
+            title: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            keywords: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            submission_type: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            authors: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+          {
+            abstract: {
+              [Op.like]: `%${searchQuery}%`,
+            },
+          },
+        ],
+      },
+    });
+    res.status(201).json(submissions);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+exports.getcontentUniversityIdDepartementId = async (req, res) => {
+  try {
+    const { univId } = req.params;
+    const { deptId } = req.params;
+
+    const submissions = await Submission.findAll({
+      where: {
+        status: "approved",
+        department: deptId,
+        university: univId,
+      },
+    });
+    if (!submissions || submissions.length == 0) {
+      return res.status(400).json({ error: "content is not available" });
+    }
+    res.status(201).json(submissions);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.getcontentUniversityIdCollegeIdDepartementId = async (req, res) => {
+  try {
+    const { univId } = req.params;
+    const { deptId } = req.params;
+    const { clgId } = req.params;
+
+    const submissions = await Submission.findAll({
+      where: {
+        status: "approved",
+        department: deptId,
+        university: univId,
+        institution: clgId,
+      },
+    });
+    if (!submissions || submissions.length == 0) {
+      return res.status(400).json({ error: "content is not available" });
+    }
+    res.status(201).json(submissions);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+exports.getCollegesByUniversityId = async (req, res) => {
+  try {
+    const { univId } = req.params;
+
+    const clg = await College.findAll({
+      where: {
+        trash: 0,
+        university_id: univId,
+        // institution: clgId,
+      },
+    });
+    if (!clg || clg.length == 0) {
+      return res.status(400).json({ error: "college is not available" });
+    }
+    res.status(201).json(clg);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 exports.getDepartmentsByCollegeId = async (req, res) => {
   try {
     const { collegeId } = req.params;

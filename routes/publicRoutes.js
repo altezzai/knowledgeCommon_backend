@@ -20,5 +20,17 @@ router.get(
   "/university/:univId/searchDepartments/",
   publicController.searchDepartmentsByUniversityId
 );
-
+router.get("/contentsearch/", publicController.contentsearch);
+router.get(
+  "/getcontent/university/:univId/department/:deptId",
+  publicController.getcontentUniversityIdDepartementId
+);
+router.get(
+  "/getcontent/university/:univId/college/:clgId/department/:deptId",
+  publicController.getcontentUniversityIdCollegeIdDepartementId
+);
+router.get(
+  "/university/:univId/colleges",
+  publicController.getCollegesByUniversityId
+);
 module.exports = router;

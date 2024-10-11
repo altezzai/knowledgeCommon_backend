@@ -77,6 +77,9 @@ module.exports = (sequelize, DataTypes) => {
       department: {
         type: DataTypes.STRING,
       },
+      university: {
+        type: DataTypes.INTEGER,
+      },
       institution: {
         type: DataTypes.STRING,
       },
